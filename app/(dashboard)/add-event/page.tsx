@@ -1,10 +1,23 @@
-import EventForm from "@/app/components/eventForm";
-import React from "react";
+import dynamic from "next/dynamic";
+const EventForm = dynamic(
+    () => import("@/app/components/eventForm"),
+    { ssr: false }
+);
 
 export default function EventFormPage() {
+    const formDataItem = {
+        event: {
+            title: "",
+            description: "",
+            location: "",
+            date: "",
+            time: "",
+        },
+    };
+    const isEdit = false;
     return (
-        <div>
-            <EventForm />
-        </div>
+        <>
+            <EventForm formDataItem={formDataItem} isEdit={isEdit} />
+        </>
     );
 }

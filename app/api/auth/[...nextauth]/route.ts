@@ -29,7 +29,7 @@ export const authOptions: any = {
                         return null;
                     }
 
-                    return user;
+                    return { ...user.toObject(), id: user._id }; // Include user ID and other fields you may need
                 } catch (error) {
                     console.log("Error: ", error);
                 }
@@ -42,6 +42,26 @@ export const authOptions: any = {
     secret: process.env.NEXTAUTH_SECRET,
     pages: {
         signIn: "/login",
+    },
+    callbacks: {
+        async jwt(
+            token: { id: any; role: any },
+            user: { id: any; role: any }
+        ) {
+            if (user) {
+                token.id = user.id;
+                token.role = user.role; // Include user role in the JWT token
+            }
+            return token;
+        },
+        async session(session: { user: any }, token: any) {
+            session.user = token;
+            return session;
+        },
+        async signIn(user: { id: any; role: any }) {
+            // If the user is not an admin, you can customize the behavior or return null
+            return { ...user, role: user.role };
+        },
     },
 };
 

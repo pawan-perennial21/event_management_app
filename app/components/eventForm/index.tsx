@@ -1,47 +1,115 @@
-// EventForm.js
 "use client";
+import { addEvent, editEvent } from "@/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { FormEventHandler, useState } from "react";
 
-const EventForm = () => {
-    const [formData, setFormData] = useState({
+const EventForm = ({ formDataItem, isEdit }: any) => {
+    const router = useRouter();
+    function formatDate(inputDateString: string) {
+        const inputDate = new Date(inputDateString);
+
+        const day = inputDate
+            .getUTCDate()
+            .toString()
+            .padStart(2, "0");
+        const month = (inputDate.getUTCMonth() + 1)
+            .toString()
+            .padStart(2, "0"); // Months are zero-indexed
+        const year = inputDate.getUTCFullYear();
+
+        return `${year}-${month}-${day}`;
+    }
+
+    const originalDate = new Date(formDataItem.event.time);
+
+    const formattedTime = originalDate.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        hour12: false,
+        minute: "2-digit",
+        timeZone: "UTC",
+    });
+
+    const formattedDate = formatDate(formDataItem.event.date);
+    const [formData, setFormData] = useState<any>({
+        title: formDataItem?.event?.title,
+        description: formDataItem?.event?.description,
+        location: formDataItem?.event?.location,
+        date: formattedDate,
+        time: formattedTime,
+    });
+    const [formErrors, setFormErrors] = useState<any>({
         title: "",
         description: "",
         location: "",
-        image: "",
-        isFeatured: false,
+        date: "",
+        time: "",
     });
 
-    const router = useRouter();
+
+    const validateForm = () => {
+        const errors: any = {};
+
+        // Title validation
+        if (!formData.title.trim()) {
+            errors.title = "Title is required";
+        }
+
+        // Description validation
+        if (!formData.description.trim()) {
+            errors.description = "Description is required";
+        }
+
+        // Location validation
+        if (!formData.location.trim()) {
+            errors.location = "Location is required";
+        }
+
+        // Date validation
+        if (!formData.date.trim()) {
+            errors.date = "Date is required";
+        }
+
+        // Time validation
+        if (!formData.time.trim()) {
+            errors.time = "Time is required";
+        }
+
+        setFormErrors(errors);
+
+        // Return true if there are no errors, indicating the form is valid
+        return Object.values(errors).every((error) => !error);
+    };
 
     const handleChange = (e: {
         target: { name: any; value: any };
     }) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({ ...prevData, [name]: value }));
+        setFormData((prevData: any) => ({
+            ...prevData,
+            [name]: value,
+        }));
     };
 
-    const handleSubmit = async (e: {
-        preventDefault: () => void;
-    }) => {
+    const handleSubmit: FormEventHandler<HTMLFormElement> = async (
+        e
+    ) => {
         e.preventDefault();
-        try {
-            console.log("formData",formData)
-            const response = await axios.post(
-                "http://localhost:3000/api/events",
-                formData
-            );
+        if (validateForm()) {
+            const response = isEdit
+                ? await editEvent({
+                      formData,
+                      editId: formDataItem?.event._id,
+                  })
+                : await addEvent(formData);
+            console.log("responseresponseresponse", response);
             if (response.status === 200) {
-                console.log("IN",response)
-                router.push("/")
+                router.refresh();
+                router.push("/");
             }
-        } catch (error) {
-            console.error("Error submitting form:", error);
         }
     };
 
@@ -52,51 +120,112 @@ const EventForm = () => {
         >
             <Label>Title</Label>
             <Input
-                // label="Title"
                 name='title'
                 value={formData.title}
                 onChange={handleChange}
-                className='mb-4'
+                className='mb-2'
             />
+            {formErrors.title && (
+                <p className='text-red-500 text-sm'>
+                    {formErrors.title}
+                </p>
+            )}
             <Label>Description</Label>
             <Textarea
-                // label="Description"
                 name='description'
                 value={formData.description}
                 onChange={handleChange}
-                className='mb-4'
+                className='mb-2'
             />
+            {formErrors.description && (
+                <p className='text-red-500 text-sm'>
+                    {formErrors.description}
+                </p>
+            )}
             <Label>Location</Label>
             <Input
                 name='location'
                 value={formData.location}
                 onChange={handleChange}
-                className='mb-4'
+                className='mb-2'
             />
-            {/* <Label>Date</Label>
+            {formErrors.location && (
+                <p className='text-red-500 text-sm'>
+                    {formErrors.location}
+                </p>
+            )}
+            <Label>Date</Label>
             <Input
                 type='date'
                 name='date'
                 value={formData.date}
                 onChange={handleChange}
-                className='mb-4'
-            /> */}
-            <Input
-                // label="Image"
-                type='file'
-                title='Image'
-                name='image'
-                value={formData.image}
-                onChange={handleChange}
-                className='mb-4'
+                className='mb-2'
             />
+            {formErrors.date && (
+                <p className='text-red-500 text-sm'>
+                    {formErrors.date}
+                </p>
+            )}
+            <Label>Time</Label>
+            <Input
+                type='time'
+                name='time'
+                value={formData.time}
+                onChange={handleChange}
+                className='mb-2'
+            />
+            {formErrors.time && (
+                <p className='text-red-500 text-sm'>
+                    {formErrors.time}
+                </p>
+            )}
             <Button
                 type='submit'
-                className='bg-blue-500 text-white px-4 py-2 rounded-md mt-4'
+                className='bg-blue-900 hover:bg-blue-900 text-white px-4 py-2 rounded-md mt-4'
             >
-                Submit
+                {isEdit ? "Update" : "Submit"}
             </Button>
         </form>
+        // <form
+        //     onSubmit={handleSubmit}
+        //     className='max-w-md mx-auto my-8 p-6 bg-white rounded-md shadow-md'
+        // >
+        //     {["title", "description", "location", "date", "time"].map(
+        //         (field) => (
+        //             <div key={field} className='mb-4'>
+        //                 <Label>
+        //                     {field.charAt(0).toUpperCase() +
+        //                         field.slice(1)}
+        //                 </Label>
+        //                 <Input
+        //                     type={
+        //                         field === "date"
+        //                             ? "date"
+        //                             : field === "textarea"
+        //                             ? "textarea"
+        //                             : field === "time"
+        //                             ? "time"
+        //                             : "text"
+        //                     }
+        //                     name={field}
+        //                     value={formData[field]}
+        //                     onChange={handleChange}
+        //                     className='mb-4'
+        //                 />
+        //                 <div className='text-red-500 text-sm'>
+        //                     {formErrors[field]}
+        //                 </div>
+        //             </div>
+        //         )
+        //     )}
+        //     <Button
+        //         type='submit'
+        //         className='bg-blue-900 hover:bg-blue-900 text-white px-4 py-2 rounded-md mt-4'
+        //     >
+        //         {isEdit ? "Update" : "Submit"}
+        //     </Button>
+        // </form>
     );
 };
 

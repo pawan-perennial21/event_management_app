@@ -20,9 +20,10 @@ export default function LoginPage() {
             const res = await signIn("credentials", {
                 email,
                 password,
+                role:'admin',
                 redirect: false,
             });
-
+            console.log("signIn===>", res);
             if (res?.error) {
                 setError("Invalid Credentials");
                 return;
@@ -54,7 +55,9 @@ export default function LoginPage() {
                         type='password'
                         placeholder='Password'
                     />
-                    <Button className='bg-blue-700 hover:bg-blue-700'>Login</Button>
+                    <Button className='bg-blue-700 hover:bg-blue-700'>
+                        Login
+                    </Button>
                     {error && (
                         <div className='bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2'>
                             {error}

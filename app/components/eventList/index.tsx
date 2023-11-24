@@ -1,20 +1,30 @@
-import React from "react";
-import EventItem from "../eventItem";
+import dynamic from "next/dynamic";
 
+const EventItem = dynamic(() => import("../eventItem"), {
+    ssr: false,
+});
 export default function EventList(props: any) {
-    const { items } = props;
+    const {
+        items: { event },
+    } = props;
     return (
         <ul>
-            {items.map((event: any) => (
-                <EventItem
-                    key={event.id}
-                    id={event.id}
-                    title={event.title}
-                    location={event.location}
-                    date={event.date}
-                    image={event.image}
-                />
-            ))}
+            {event.length > 0 ? (
+                <ul>
+                    {event.map((item: any) => (
+                        <EventItem
+                            key={item._id}
+                            id={item._id}
+                            title={item.title}
+                            location={item.location}
+                            date={item.date}
+                            time={item.time}
+                        />
+                    ))}
+                </ul>
+            ) : (
+                <p className="font-semibold text-center">Please Add Events</p>
+            )}
         </ul>
     );
 }

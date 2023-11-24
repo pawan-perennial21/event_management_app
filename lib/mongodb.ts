@@ -1,16 +1,21 @@
-import mongoose, { ConnectOptions } from "mongoose";
+import mongoose from "mongoose";
 
-// const options: ConnectOptions = {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//     // Add other options as needed
-// };
-export const connectMongoDB = async () => {
+export async function connectMongoDB() {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || "");
+        mongoose.connect(process.env.MONGODB_URI || "");
+        const connection = mongoose.connection;
 
-        console.log("Connected to MongoDB");
-    } catch (error: any) {
-        console.error("Error connecting to MongoDB:", error.message);
+        connection.on("connected", () => {
+            console.log("Database connected successfully");
+        });
+
+        connection.on("error", (err) => {
+            console.log(
+                `Database connection error, Please make sure the database is running, ${err}`
+            );
+            process.exit();
+        });
+    } catch (error) {
+        console.log(`Error while connecting with database, ${error}`);
     }
-};
+}

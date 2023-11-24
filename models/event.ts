@@ -5,8 +5,8 @@ interface IEVENT extends Document {
   description: string;
   location: string;
   date: Date;
-  image: string;
-  isFeatured: boolean;
+  time: any;
+  // user: Schema.Types.ObjectId; // Reference to User
 }
 
 const eventSchema = new Schema<IEVENT>({
@@ -14,10 +14,11 @@ const eventSchema = new Schema<IEVENT>({
   description: { type: String, required: true },
   location: { type: String, required: true },
   date: { type: Date, required: false },
-  image: { type: String, required: true },
-  isFeatured: { type: Boolean, required: true },
+  time: { type: Date, required: false },
+  // user: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
 });
 
-const Event = mongoose.model<IEVENT>('Event', eventSchema);
+const Event =
+    mongoose.models.Event || mongoose.model("Event", eventSchema);
 
 export default Event;

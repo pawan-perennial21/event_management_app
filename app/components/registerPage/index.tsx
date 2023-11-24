@@ -11,6 +11,7 @@ export default function RegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [isAdmin, setIsAdmin] = useState(false);
     const router = useRouter();
 
     const handleSubmit = async (e: {
@@ -25,20 +26,20 @@ export default function RegisterPage() {
         }
 
         try {
-            const resUserExists = await fetch("api/userExists", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email }),
-            });
+            // const resUserExists = await fetch("api/userExists", {
+            //     method: "POST",
+            //     headers: {
+            //         "Content-Type": "application/json",
+            //     },
+            //     body: JSON.stringify({ email }),
+            // });
 
-            const { user } = await resUserExists.json();
+            // const { user } = await resUserExists.json();
 
-            if (user) {
-                setError("User already exists.");
-                return;
-            }
+            // if (user) {
+            //     setError("User already exists.");
+            //     return;
+            // }
 
             const res = await fetch("api/register", {
                 method: "POST",
@@ -49,16 +50,25 @@ export default function RegisterPage() {
                     name,
                     email,
                     password,
+                    role: isAdmin ? "admin" : "user",
                 }),
             });
-
-            if (res.ok) {
+            const data = await res.json();
+            console.log("datadata====>", data);
+            if (data.status === 201) {
                 const form = e.target;
                 form.reset();
                 router.push("/login");
-            } else {
-                console.log("User registration failed.");
+            } else if (data.status === 400) {
+                setError(data.message);
             }
+            // if (res.ok) {
+            //     const form = e.target;
+            //     form.reset();
+            //     router.push("/login");
+            // } else {
+            //     console.log("User registration failed.");
+            // }
         } catch (error) {
             console.log("Error during registration: ", error);
         }
@@ -87,13 +97,25 @@ export default function RegisterPage() {
                         type='password'
                         placeholder='Password'
                     />
-                    <Button className='bg-blue-700 hover:bg-blue-700'>Register</Button>
+                    <Button className='bg-blue-700 hover:bg-blue-700'>
+                        Register
+                    </Button>
 
                     {error && (
                         <div className='bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2'>
                             {error}
                         </div>
                     )}
+                    {/* {isAdmin && ( */}
+                    <label className='flex items-center gap-2'>
+                        <Input
+                            type='checkbox'
+                            checked={isAdmin}
+                            onChange={() => setIsAdmin(!isAdmin)}
+                        />
+                        Admin
+                    </label>
+                    {/* )} */}
 
                     <Link
                         className='text-sm mt-3 text-right'

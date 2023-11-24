@@ -1,55 +1,106 @@
 import { connectMongoDB } from "@/lib/mongodb";
 import Event from "@/models/event";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (req: Request, res: Response) => {
-    console.log("GET");
+export async function GET() {
     try {
-      await connectMongoDB(); // Make sure the database is connected before querying
+        // Connect to MongoDB
+        await connectMongoDB();
 
-      const allPosts = await Event.find({}); 
+        // Find all events
+        const event = await Event.find();
+
+        // Return the list of events
+        return NextResponse.json({ event });
+    } catch (error) {
+        // Handle any errors and return an error response
+        console.error("Error retrieving topics:", error);
         return NextResponse.json(
-            { message: "OK", allPosts },
-            { status: 200 }
-        );
-    } catch (err) {
-        return NextResponse.json(
-            {
-                message: "Error",
-                err,
-            },
+            { message: "Internal Server Error" },
             { status: 500 }
         );
     }
-};
+}
 
-export const POST = async (req: Request, res: Response) => {
-    const { title, description, location, image, isFeatured } = await req.json();
+export async function POST(request: NextRequest) {
     try {
-        const post = {
+        // Destructure title and description from the JSON body
+        const { title, description, date, time, location } =
+            await request.json();
+        const timeAsDate = new Date(`1970-01-01T${time}`);
+        // Connect to MongoDB
+        await connectMongoDB();
+
+        // Create a new event
+        await Event.create({
             title,
-            id: Date.now().toString(),
             description,
+            date,
+            time: timeAsDate,
             location,
-            date: new Date(),
-            image,
-            isFeatured,
-      };
-      await connectMongoDB(); // Make sure the database is connected before adding a post
+        });
 
-      const newPost = new Event(post);
-      await newPost.save();
+        // Return a success response
+        return NextResponse.json({
+            message: "Event Created",
+            status: 200,
+        });
+    } catch (error) {
+        // Handle any errors and return an error response
+        console.error("Error creating event:", error);
         return NextResponse.json(
-            { message: "OK", post },
-            { status: 200 }
-        );
-    } catch (err) {
-        return NextResponse.json(
-            {
-                message: "Error",
-                err,
-            },
+            { message: "Internal Server Error" },
             { status: 500 }
         );
     }
-};
+}
+
+// import { getSession } from "next-auth/react";
+
+// export async function POST(request: NextRequest) {
+//     try {
+//         const session = await getSession({ req: request });
+//         // Check if the user is an admin
+
+//         const userRole = session?.user?.role;
+
+//         if (userRole !== "admin") {
+//             // If the user is not an admin, return an unauthorized response
+//             return NextResponse.json({
+//                 message: "Unauthorized",
+//                 status: 401,
+//             });
+//         }
+
+//         // Destructure title and description from the JSON body
+//         const { title, description, date, time, location } =
+//             await request.json();
+
+//         const timeAsDate = new Date(`1970-01-01T${time}`);
+
+//         // Connect to MongoDB
+//         await connectMongoDB();
+
+//         // Create a new event
+//         await Event.create({
+//             title,
+//             description,
+//             date,
+//             time: timeAsDate,
+//             location,
+//         });
+
+//         // Return a success response
+//         return NextResponse.json({
+//             message: "Event Created",
+//             status: 200,
+//         });
+//     } catch (error) {
+//         // Handle any errors and return an error response
+//         console.error("Error creating event:", error);
+//         return NextResponse.json(
+//             { message: "Internal Server Error" },
+//             { status: 500 }
+//         );
+//     }
+// }
