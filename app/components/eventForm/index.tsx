@@ -2,13 +2,22 @@
 import { addEvent, editEvent } from "@/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { eventSchema } from "@/lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { FormEventHandler, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+interface EventFormValues {
+    title: string;
+    description: string;
+    location: string;
+    date: string;
+    time: string;
+}
 
 const EventForm = ({ formDataItem, isEdit }: any) => {
     const router = useRouter();
+
     function formatDate(inputDateString: string) {
         const inputDate = new Date(inputDateString);
 
@@ -18,7 +27,7 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
             .padStart(2, "0");
         const month = (inputDate.getUTCMonth() + 1)
             .toString()
-            .padStart(2, "0"); // Months are zero-indexed
+            .padStart(2, "0");
         const year = inputDate.getUTCFullYear();
 
         return `${year}-${month}-${day}`;
@@ -32,153 +41,94 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
         minute: "2-digit",
         timeZone: "UTC",
     });
-
     const formattedDate = formatDate(formDataItem.event.date);
-    const [formData, setFormData] = useState<any>({
-        title: formDataItem?.event?.title,
-        description: formDataItem?.event?.description,
-        location: formDataItem?.event?.location,
-        date: formattedDate,
-        time: formattedTime,
+    const {
+        register,
+        handleSubmit,
+        setError,
+        formState: { errors },
+    } = useForm<EventFormValues>({
+        defaultValues: {
+            title: formDataItem.event.title || "",
+            description: formDataItem.event.description || "",
+            location: formDataItem.event.location || "",
+            date: formattedDate || "",
+            time: formattedTime || "",
+        },
+        resolver: zodResolver(eventSchema),
     });
-    const [formErrors, setFormErrors] = useState<any>({
-        title: "",
-        description: "",
-        location: "",
-        date: "",
-        time: "",
-    });
 
-
-    const validateForm = () => {
-        const errors: any = {};
-
-        // Title validation
-        if (!formData.title.trim()) {
-            errors.title = "Title is required";
-        }
-
-        // Description validation
-        if (!formData.description.trim()) {
-            errors.description = "Description is required";
-        }
-
-        // Location validation
-        if (!formData.location.trim()) {
-            errors.location = "Location is required";
-        }
-
-        // Date validation
-        if (!formData.date.trim()) {
-            errors.date = "Date is required";
-        }
-
-        // Time validation
-        if (!formData.time.trim()) {
-            errors.time = "Time is required";
-        }
-
-        setFormErrors(errors);
-
-        // Return true if there are no errors, indicating the form is valid
-        return Object.values(errors).every((error) => !error);
-    };
-
-    const handleChange = (e: {
-        target: { name: any; value: any };
-    }) => {
-        const { name, value } = e.target;
-        setFormData((prevData: any) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    const handleSubmit: FormEventHandler<HTMLFormElement> = async (
-        e
+    const onSubmit: SubmitHandler<EventFormValues> = async (
+        dataValue
     ) => {
-        e.preventDefault();
-        if (validateForm()) {
-            const response = isEdit
-                ? await editEvent({
-                      formData,
-                      editId: formDataItem?.event._id,
-                  })
-                : await addEvent(formData);
-            console.log("responseresponseresponse", response);
-            if (response.status === 200) {
-                router.refresh();
-                router.push("/");
-            }
+        const response = isEdit
+            ? await editEvent({
+                  dataValue,
+                  editId: formDataItem?.event._id,
+              })
+            : await addEvent(dataValue);
+        if (response.status === 200) {
+            router.refresh();
+            router.push("/");
         }
     };
 
     return (
         <form
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             className='max-w-md mx-auto my-8 p-6 bg-white rounded-md shadow-md'
         >
-            <Label>Title</Label>
             <Input
-                name='title'
-                value={formData.title}
-                onChange={handleChange}
+                {...register("title")}
+                placeholder='Title'
                 className='mb-2'
             />
-            {formErrors.title && (
-                <p className='text-red-500 text-sm'>
-                    {formErrors.title}
+
+            {errors.title?.message && (
+                <p className='text-red-500'>
+                    {errors.title?.message}
                 </p>
             )}
-            <Label>Description</Label>
             <Textarea
-                name='description'
-                value={formData.description}
-                onChange={handleChange}
+                {...register("description")}
                 className='mb-2'
+                placeholder='Description'
             />
-            {formErrors.description && (
-                <p className='text-red-500 text-sm'>
-                    {formErrors.description}
+            {errors.description?.message && (
+                <p className='text-red-500'>
+                    {errors.description?.message}
                 </p>
             )}
-            <Label>Location</Label>
             <Input
-                name='location'
-                value={formData.location}
-                onChange={handleChange}
+                {...register("location")}
+                // onChange={handleChange}
                 className='mb-2'
+                placeholder='Location'
             />
-            {formErrors.location && (
-                <p className='text-red-500 text-sm'>
-                    {formErrors.location}
+            {errors.location?.message && (
+                <p className='text-red-500'>
+                    {errors.location?.message}
                 </p>
             )}
-            <Label>Date</Label>
+
             <Input
                 type='date'
-                name='date'
-                value={formData.date}
-                onChange={handleChange}
+                {...register("date")}
                 className='mb-2'
+                placeholder='Date'
             />
-            {formErrors.date && (
-                <p className='text-red-500 text-sm'>
-                    {formErrors.date}
-                </p>
+            {errors.date?.message && (
+                <p className='text-red-500'>{errors.date?.message}</p>
             )}
-            <Label>Time</Label>
+
             <Input
                 type='time'
-                name='time'
-                value={formData.time}
-                onChange={handleChange}
+                {...register("time")}
                 className='mb-2'
+                placeholder='Time'
             />
-            {formErrors.time && (
-                <p className='text-red-500 text-sm'>
-                    {formErrors.time}
-                </p>
+            {errors.time?.message && (
+                <p className='text-red-500'>{errors.time?.message}</p>
             )}
             <Button
                 type='submit'
@@ -187,45 +137,6 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
                 {isEdit ? "Update" : "Submit"}
             </Button>
         </form>
-        // <form
-        //     onSubmit={handleSubmit}
-        //     className='max-w-md mx-auto my-8 p-6 bg-white rounded-md shadow-md'
-        // >
-        //     {["title", "description", "location", "date", "time"].map(
-        //         (field) => (
-        //             <div key={field} className='mb-4'>
-        //                 <Label>
-        //                     {field.charAt(0).toUpperCase() +
-        //                         field.slice(1)}
-        //                 </Label>
-        //                 <Input
-        //                     type={
-        //                         field === "date"
-        //                             ? "date"
-        //                             : field === "textarea"
-        //                             ? "textarea"
-        //                             : field === "time"
-        //                             ? "time"
-        //                             : "text"
-        //                     }
-        //                     name={field}
-        //                     value={formData[field]}
-        //                     onChange={handleChange}
-        //                     className='mb-4'
-        //                 />
-        //                 <div className='text-red-500 text-sm'>
-        //                     {formErrors[field]}
-        //                 </div>
-        //             </div>
-        //         )
-        //     )}
-        //     <Button
-        //         type='submit'
-        //         className='bg-blue-900 hover:bg-blue-900 text-white px-4 py-2 rounded-md mt-4'
-        //     >
-        //         {isEdit ? "Update" : "Submit"}
-        //     </Button>
-        // </form>
     );
 };
 

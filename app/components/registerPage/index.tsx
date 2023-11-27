@@ -3,29 +3,32 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
+import { registrationSchema } from "@/lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+type Inputs = {
+    name: string;
+    email: string;
+    password: string;
+};
 
 export default function RegisterPage() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [isAdmin, setIsAdmin] = useState(false);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<Inputs>({
+        resolver: zodResolver(registrationSchema),
+    });
+    // const [error, setError] = useState("");
     const router = useRouter();
 
-    const handleSubmit = async (e: {
-        preventDefault: () => void;
-        target: any;
-    }) => {
-        e.preventDefault();
-
-        if (!name || !email || !password) {
-            setError("All fields are necessary.");
-            return;
-        }
-
+    const onSubmit: SubmitHandler<Inputs> = async (dataValue) => {
+        console.log(dataValue);
         try {
             const res = await fetch("api/register", {
                 method: "POST",
@@ -33,71 +36,64 @@ export default function RegisterPage() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    name,
-                    email,
-                    password,
-                    role: isAdmin ? "admin" : "user",
+                    ...dataValue,
+                    role: "user",
                 }),
             });
             const data = await res.json();
             if (data.status === 201) {
-                const form = e.target;
-                form.reset();
                 router.push("/login");
             } else if (data.status === 400) {
-                setError(data.message);
+                // setError(data.message);
             }
         } catch (error) {
             console.log("Error during registration: ", error);
         }
     };
-    return (
+
+    resolver: return (
         <div className='grid place-items-center h-screen'>
             <div className='shadow-lg p-5 sm:w-3/4 md:w-2/4 lg:w-1/4 rounded-lg border-t-4 border-blue-700'>
                 <h1 className='text-xl font-bold my-4'>Register</h1>
 
                 <form
-                    onSubmit={handleSubmit}
+                    onSubmit={handleSubmit(onSubmit)}
                     className='flex flex-col gap-3'
                 >
                     <Input
-                        onChange={(e) => setName(e.target.value)}
+                        {...register("name")}
                         type='text'
                         placeholder='Full Name'
                     />
+                    {errors.name?.message && (
+                        <Label className='text-red-500'>
+                            {errors.name?.message}
+                        </Label>
+                    )}
                     <Input
-                        onChange={(e) => setEmail(e.target.value)}
+                        {...register("email")}
                         type='text'
                         placeholder='Email'
                     />
+                    {errors.email?.message && (
+                        <Label className='text-red-500'>
+                            {errors.email?.message}
+                        </Label>
+                    )}
                     <Input
-                        onChange={(e) => setPassword(e.target.value)}
+                        {...register("password")}
                         type='password'
                         placeholder='Password'
                     />
-                    <div className='flex'>
-                        <Input
-                            type='checkbox'
-                            className='w-4'
-                            checked={isAdmin}
-                            onChange={() => setIsAdmin(!isAdmin)}
-                        />
-                        <Label className='flex items-center gap-2 ml-2'>
-                            Admin
+                    {errors.password?.message && (
+                        <Label className='text-red-500'>
+                            {errors.password?.message}
                         </Label>
-                    </div>
-                    <Label className='text-red-500'>
-                            Note:- default is normal user
-                        </Label>
+                    )}
+
                     <Button className='bg-blue-700 hover:bg-blue-700'>
                         Register
                     </Button>
-
-                    {error && (
-                        <div className='bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2'>
-                            {error}
-                        </div>
-                    )}
 
                     <Link
                         className='text-sm mt-3 text-right'

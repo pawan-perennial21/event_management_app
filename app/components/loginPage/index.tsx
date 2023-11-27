@@ -5,25 +5,37 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema } from "@/lib/validation";
+import { Label } from "@/components/ui/label";
+
+type Inputs = {
+    email: string;
+    password: string;
+};
 
 export default function LoginPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<Inputs>({
+        resolver: zodResolver(loginSchema),
+    });
+    const [apiError, setApiError] = useState("");
+
     const router = useRouter();
 
-    const handleSubmit = async (e: {
-        preventDefault: () => void;
-    }) => {
-        e.preventDefault();
+    const onSubmit: SubmitHandler<Inputs> = async (dataValue) => {
+        console.log("data===>",dataValue)
         try {
             const res = await signIn("credentials", {
-                email,
-                password,
+                ...dataValue,
                 redirect: false,
             });
             if (res?.error) {
-                setError("Invalid Credentials");
+                setApiError("Invalid Credentials");
                 return;
             }
 
@@ -38,27 +50,38 @@ export default function LoginPage() {
                 <h1 className='text-xl font-bold my-4'>Login</h1>
 
                 <form
-                    onSubmit={handleSubmit}
+                    onSubmit={handleSubmit(onSubmit)}
                     className='flex flex-col gap-3'
                 >
                     <Input
-                        className='p-2 rounded-md'
-                        onChange={(e) => setEmail(e.target.value)}
+                        {...register("email")}
                         type='text'
                         placeholder='Email'
                     />
+                    {errors.email?.message && (
+                        <Label className='text-red-500'>
+                            {errors.email?.message}
+                        </Label>
+                    )}
                     <Input
-                        className='p-2 rounded-md'
-                        onChange={(e) => setPassword(e.target.value)}
+                        {...register("password")}
                         type='password'
                         placeholder='Password'
                     />
-                    <Button className='bg-blue-700 hover:bg-blue-700'>
+                    {errors.password?.message && (
+                        <Label className='text-red-500'>
+                            {errors.password?.message}
+                        </Label>
+                    )}
+                    <Button
+                        type='submit'
+                        className='bg-blue-700 hover:bg-blue-700'
+                    >
                         Login
                     </Button>
-                    {error && (
+                    {apiError && (
                         <div className='bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2'>
-                            {error}
+                            {apiError}
                         </div>
                     )}
 
