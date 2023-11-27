@@ -1,6 +1,7 @@
 "use client";
 import { deleteEvent } from "@/api";
 import { Button } from "@/components/ui/button";
+import { EventDetails, EventFormValues } from "@/types/interface";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,7 +9,7 @@ import React from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDelete } from "react-icons/md";
 
-export default function EventItem(props: any) {
+export default function EventItem(props: EventDetails) {
     const { title, date, location, time, id } = props;
     const { data: session }: any = useSession();
     const router = useRouter();

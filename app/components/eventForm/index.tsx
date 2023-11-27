@@ -4,18 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { eventSchema } from "@/lib/validation";
+import { EventFormValues } from "@/types/interface";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
-interface EventFormValues {
-    title: string;
-    description: string;
-    location: string;
-    date: string;
-    time: string;
-}
 
-const EventForm = ({ formDataItem, isEdit }: any) => {
+interface EventFormProps {
+    formDataItem: {
+        event: EventFormValues;
+    };
+    isEdit: boolean;
+}
+const EventForm = ({ formDataItem, isEdit }: EventFormProps) => {
     const router = useRouter();
 
     function formatDate(inputDateString: string) {
@@ -33,7 +33,7 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
         return `${year}-${month}-${day}`;
     }
 
-    const originalDate = new Date(formDataItem.event.time);
+    const originalDate = new Date(formDataItem?.event?.time);
 
     const formattedTime = originalDate.toLocaleTimeString("en-US", {
         hour: "2-digit",
@@ -41,16 +41,16 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
         minute: "2-digit",
         timeZone: "UTC",
     });
-    const formattedDate = formatDate(formDataItem.event.date);
+    const formattedDate = formatDate(formDataItem?.event?.date);
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<EventFormValues>({
         defaultValues: {
-            title: formDataItem.event.title || "",
-            description: formDataItem.event.description || "",
-            location: formDataItem.event.location || "",
+            title: formDataItem?.event?.title || "",
+            description: formDataItem?.event?.description || "",
+            location: formDataItem?.event?.location || "",
             date: formattedDate || "",
             time: formattedTime || "",
         },
