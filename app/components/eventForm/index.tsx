@@ -80,7 +80,7 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
             <Input
                 {...register("title")}
                 placeholder='Title'
-                className='mb-2'
+                className='mb-4'
             />
 
             {errors.title?.message && (
@@ -90,7 +90,7 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
             )}
             <Textarea
                 {...register("description")}
-                className='mb-2'
+                className='mb-4'
                 placeholder='Description'
             />
             {errors.description?.message && (
@@ -100,8 +100,7 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
             )}
             <Input
                 {...register("location")}
-                // onChange={handleChange}
-                className='mb-2'
+                className='mb-4'
                 placeholder='Location'
             />
             {errors.location?.message && (
@@ -113,7 +112,7 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
             <Input
                 type='date'
                 {...register("date")}
-                className='mb-2'
+                className='mb-4'
                 placeholder='Date'
             />
             {errors.date?.message && (
@@ -123,7 +122,7 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
             <Input
                 type='time'
                 {...register("time")}
-                className='mb-2'
+                className='mb-4'
                 placeholder='Time'
             />
             {errors.time?.message && (
