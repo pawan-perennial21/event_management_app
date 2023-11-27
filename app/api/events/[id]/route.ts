@@ -1,7 +1,7 @@
 import { connectMongoDB } from "@/lib/mongodb";
 import Event from "@/models/event";
-import { NextRequest, NextResponse } from "next/server";
-import {ObjectId} from "mongodb"
+import { NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
 
 export async function GET(
     request: Request,
@@ -29,40 +29,6 @@ export async function GET(
     }
 }
 
-// export async function DELETE(request: NextRequest) {
-//     try {
-//         const id = request.nextUrl.searchParams.get("id");
-//         console.log("====>",id)
-//         await connectMongoDB();
-
-//         if (!id) {
-//             return NextResponse.json(
-//                 { message: "Invalid request, ID not provided" },
-//                 { status: 400 }
-//             );
-//         }
-
-//         const deletedEvent = await Event.findByIdAndDelete(id);
-
-//         if (!deletedEvent) {
-//             return NextResponse.json(
-//                 { message: "Event not found" },
-//                 { status: 404 }
-//             );
-//         }
-
-//         return NextResponse.json(
-//             { message: "Event deleted" },
-//             { status: 200 }
-//         );
-//     } catch (error) {
-//         console.error("Error deleting event:", error);
-//         return NextResponse.json(
-//             { message: "Internal Server Error" },
-//             { status: 500 }
-//         );
-//     }
-// }
 export const DELETE = async (req: Request, res: Response) => {
     const id = req.url.split("/events/")[1];
 
@@ -75,8 +41,6 @@ export const DELETE = async (req: Request, res: Response) => {
             );
         }
 
-        // Find a single event by ID
-        // Find and delete the event by ID
         const deletedEvent = await Event.findOneAndDelete({
             _id: new ObjectId(id),
         });
@@ -88,9 +52,12 @@ export const DELETE = async (req: Request, res: Response) => {
             );
         }
 
-        return NextResponse.json(
-            { message: "Event Deleted", status:200,statusCode:'ok', deletedEvent },
-        );
+        return NextResponse.json({
+            message: "Event Deleted",
+            status: 200,
+            statusCode: "ok",
+            deletedEvent,
+        });
     } catch (err) {
         return NextResponse.json(
             { message: "Error", err },
