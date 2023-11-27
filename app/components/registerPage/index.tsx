@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -26,21 +27,6 @@ export default function RegisterPage() {
         }
 
         try {
-            // const resUserExists = await fetch("api/userExists", {
-            //     method: "POST",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify({ email }),
-            // });
-
-            // const { user } = await resUserExists.json();
-
-            // if (user) {
-            //     setError("User already exists.");
-            //     return;
-            // }
-
             const res = await fetch("api/register", {
                 method: "POST",
                 headers: {
@@ -54,7 +40,6 @@ export default function RegisterPage() {
                 }),
             });
             const data = await res.json();
-            console.log("datadata====>", data);
             if (data.status === 201) {
                 const form = e.target;
                 form.reset();
@@ -62,13 +47,6 @@ export default function RegisterPage() {
             } else if (data.status === 400) {
                 setError(data.message);
             }
-            // if (res.ok) {
-            //     const form = e.target;
-            //     form.reset();
-            //     router.push("/login");
-            // } else {
-            //     console.log("User registration failed.");
-            // }
         } catch (error) {
             console.log("Error during registration: ", error);
         }
@@ -97,6 +75,20 @@ export default function RegisterPage() {
                         type='password'
                         placeholder='Password'
                     />
+                    <div className='flex'>
+                        <Input
+                            type='checkbox'
+                            className='w-4'
+                            checked={isAdmin}
+                            onChange={() => setIsAdmin(!isAdmin)}
+                        />
+                        <Label className='flex items-center gap-2 ml-2'>
+                            Admin
+                        </Label>
+                    </div>
+                    <Label className='text-red-500'>
+                            Note:- default is normal user
+                        </Label>
                     <Button className='bg-blue-700 hover:bg-blue-700'>
                         Register
                     </Button>
@@ -106,16 +98,6 @@ export default function RegisterPage() {
                             {error}
                         </div>
                     )}
-                    {/* {isAdmin && ( */}
-                    <label className='flex items-center gap-2'>
-                        <Input
-                            type='checkbox'
-                            checked={isAdmin}
-                            onChange={() => setIsAdmin(!isAdmin)}
-                        />
-                        Admin
-                    </label>
-                    {/* )} */}
 
                     <Link
                         className='text-sm mt-3 text-right'

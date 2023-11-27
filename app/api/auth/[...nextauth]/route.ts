@@ -3,8 +3,10 @@ import User from "@/models/user";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { NextAuthOptions } from "next-auth";
 
-export const authOptions: any = {
+
+export const authOptions:NextAuthOptions = {
     providers: [
         CredentialsProvider({
             name: "credentials",
@@ -28,7 +30,6 @@ export const authOptions: any = {
                     if (!passwordsMatch) {
                         return null;
                     }
-
                     return { ...user.toObject(), id: user._id }; // Include user ID and other fields you may need
                 } catch (error) {
                     console.log("Error: ", error);
@@ -44,24 +45,20 @@ export const authOptions: any = {
         signIn: "/login",
     },
     callbacks: {
-        async jwt(
-            token: { id: any; role: any },
-            user: { id: any; role: any }
-        ) {
-            if (user) {
-                token.id = user.id;
-                token.role = user.role; // Include user role in the JWT token
-            }
-            return token;
+        async jwt({ token, user }: any) {
+            return { ...token, ...user };
         },
-        async session(session: { user: any }, token: any) {
+        async session({ session, token, user }: any) {
             session.user = token;
             return session;
         },
-        async signIn(user: { id: any; role: any }) {
+        async signIn(params:any) {
+            const { user } = params;
+      
+            // Your custom logic here
             // If the user is not an admin, you can customize the behavior or return null
             return { ...user, role: user.role };
-        },
+          },
     },
 };
 

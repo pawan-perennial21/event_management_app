@@ -20,10 +20,8 @@ export default function LoginPage() {
             const res = await signIn("credentials", {
                 email,
                 password,
-                role:'admin',
                 redirect: false,
             });
-            console.log("signIn===>", res);
             if (res?.error) {
                 setError("Invalid Credentials");
                 return;

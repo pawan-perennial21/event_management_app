@@ -1,6 +1,7 @@
 "use client";
 import { deleteEvent } from "@/api";
 import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -9,6 +10,7 @@ import { MdOutlineDelete } from "react-icons/md";
 
 export default function EventItem(props: any) {
     const { title, date, location, time, id } = props;
+    const { data: session }: any = useSession();
     const router = useRouter();
     const humanRedable = new Date(date).toLocaleDateString("en-US", {
         day: "numeric",
@@ -59,19 +61,21 @@ export default function EventItem(props: any) {
                         </time>
                     </div>
                 </div>
-                <div className='flex'>
-                    <Button className='bg-red-500 hover:bg-red-600'>
-                        <MdOutlineDelete
-                            size={24}
-                            onClick={() => handleDelete(id)}
-                        />
-                    </Button>
-                    <Link href={`/edit-event/${id}`}>
-                        <Button className='bg-green-500 hover:bg-green-600 ml-2'>
-                            <FaRegEdit size={24} />
+                {session?.user?.role === "admin" && (
+                    <div className='flex'>
+                        <Button className='bg-red-500 hover:bg-red-600'>
+                            <MdOutlineDelete
+                                size={24}
+                                onClick={() => handleDelete(id)}
+                            />
                         </Button>
-                    </Link>
-                </div>
+                        <Link href={`/edit-event/${id}`}>
+                            <Button className='bg-green-500 hover:bg-green-600 ml-2'>
+                                <FaRegEdit size={24} />
+                            </Button>
+                        </Link>
+                    </div>
+                )}
             </div>
             <div>
                 <Link
