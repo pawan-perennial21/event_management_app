@@ -45,7 +45,6 @@ const EventForm = ({ formDataItem, isEdit }: any) => {
     const {
         register,
         handleSubmit,
-        setError,
         formState: { errors },
     } = useForm<EventFormValues>({
         defaultValues: {

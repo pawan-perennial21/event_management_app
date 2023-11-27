@@ -5,7 +5,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validation";
 import { Label } from "@/components/ui/label";
@@ -28,7 +28,6 @@ export default function LoginPage() {
     const router = useRouter();
 
     const onSubmit: SubmitHandler<Inputs> = async (dataValue) => {
-        console.log("data===>",dataValue)
         try {
             const res = await signIn("credentials", {
                 ...dataValue,

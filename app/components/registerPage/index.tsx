@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { registrationSchema } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -24,6 +24,7 @@ export default function RegisterPage() {
     } = useForm<Inputs>({
         resolver: zodResolver(registrationSchema),
     });
+    const [apiError, setApiError] = useState("");
     // const [error, setError] = useState("");
     const router = useRouter();
 
@@ -44,7 +45,7 @@ export default function RegisterPage() {
             if (data.status === 201) {
                 router.push("/login");
             } else if (data.status === 400) {
-                // setError(data.message);
+                setApiError(data.message);
             }
         } catch (error) {
             console.log("Error during registration: ", error);
@@ -94,7 +95,11 @@ export default function RegisterPage() {
                     <Button className='bg-blue-700 hover:bg-blue-700'>
                         Register
                     </Button>
-
+                    {apiError && (
+                        <div className='bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2'>
+                            {apiError}
+                        </div>
+                    )}
                     <Link
                         className='text-sm mt-3 text-right'
                         href={"/login"}
