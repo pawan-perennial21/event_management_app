@@ -1,21 +1,22 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 interface IEVENT extends Document {
-  title: string;
-  description: string;
-  location: string;
-  date: Date;
-  time: any;
-  // user: Schema.Types.ObjectId; // Reference to User
+    title: string;
+    description: string;
+    location: string;
+    date: Date;
+    time: any;
+    registered: Boolean;
+    // user: Schema.Types.ObjectId; // Reference to User
 }
 
 const eventSchema = new Schema<IEVENT>({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  location: { type: String, required: true },
-  date: { type: Date, required: false },
-  time: { type: Date, required: false },
-  // user: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    location: { type: String, required: true },
+    date: { type: Date, required: false },
+    time: { type: Date, required: false },
+    registered: { type: Boolean, required: true },
 });
 
 const Event =

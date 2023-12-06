@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
             date,
             time: timeAsDate,
             location,
+            registered: false,
         });
 
         // Return a success response

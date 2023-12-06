@@ -26,6 +26,18 @@ export const addEvent = async (event: any): Promise<any> => {
     const newEvent = await res.json();
     return newEvent;
 };
+export const postRegisterdEvent = async (
+    eventId: any
+): Promise<any> => {
+    const res = await fetch(`${baseUrl}/api/events/${eventId}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    const newEvent = await res?.json();
+    return newEvent;
+};
 
 export const editEvent = async ({
     dataValue,

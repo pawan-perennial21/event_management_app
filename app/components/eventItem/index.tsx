@@ -9,8 +9,16 @@ import React from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDelete } from "react-icons/md";
 
-export default function EventItem(props: EventDetails) {
-    const { title, date, location, time, id } = props;
+export default function EventItem(props: any) {
+    const {
+        title,
+        date,
+        location,
+        time,
+        id,
+        isRegistered,
+        onRegister,
+    } = props;
     const { data: session }: any = useSession();
     const router = useRouter();
     const humanRedable = new Date(date).toLocaleDateString("en-US", {
@@ -88,6 +96,24 @@ export default function EventItem(props: EventDetails) {
                         Explore Events
                     </Button>
                 </Link>
+            </div>
+            <div className='flex justify-between items-center mt-4'>
+                {/* Add the registration button and handle its click event */}
+                {!isRegistered ? (
+                    <Button
+                        className='bg-blue-500 hover:bg-blue-600'
+                        onClick={onRegister}
+                    >
+                        Register
+                    </Button>
+                ) : (
+                    <Button
+                        className='bg-green-500 hover:bg-green-600'
+                        onClick={onRegister}
+                    >
+                        Registered
+                    </Button>
+                )}
             </div>
         </li>
     );

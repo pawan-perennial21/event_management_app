@@ -96,3 +96,30 @@ export async function PUT(
         });
     }
 }
+
+export async function PATCH(
+    request: Request,
+    { params: { id } }: { params: { id: string } }
+) {
+    const { registered, ...eventData } = await Event.findOne({
+        _id: id,
+    });
+
+    try {
+        await connectMongoDB();
+        await Event.findByIdAndUpdate(id, {
+            ...eventData?._doc,
+            registered: true,
+        });
+        return NextResponse.json({
+            message: "Registered updated",
+            status: 200,
+        });
+    } catch (error) {
+        return NextResponse.json({
+            message: "Error updating Registered Event",
+            status: 500,
+            error,
+        });
+    }
+}
