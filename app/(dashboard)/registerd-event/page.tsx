@@ -10,5 +10,13 @@ export default async function EventRegisterPage() {
     const registeredEvents = data?.event.filter(
         (el: any) => el.registered
     );
-    return <EventList event={registeredEvents} />;
+    return (
+        <>
+            {registeredEvents.length > 0 ? (
+                <EventList event={registeredEvents} />
+            ) : (
+                <p className='font-semibold text-center'>No Event Registered</p>
+            )}
+        </>
+    );
 }

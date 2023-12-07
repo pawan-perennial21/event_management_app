@@ -1,38 +1,22 @@
-"use client";
+"use client"
 import { postRegisterdEvent } from "@/api";
 import { EventDetails } from "@/types/interface";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const EventItem = dynamic(() => import("../eventItem"), {
     ssr: false,
 });
 export default function EventList({ event }: any) {
-    const [registeredEvents, setRegisteredEvents] = useState<
-        string[]
-    >([]);
-
     // Function to register an event
+    const router = useRouter();
     const registerEvent = async (eventId: string) => {
-        if (!isEventRegistered(eventId)) {
-            setRegisteredEvents((prevEvents) => [
-                ...prevEvents,
-                eventId,
-            ]);
-
-            const res = await postRegisterdEvent(eventId);
-            if (res.registered) {
-                return true;
-            }
-        } else {
-            return false;
+        const res = await postRegisterdEvent(eventId);
+        if (res.statusCode === "ok") {
+            router.refresh();
         }
     };
 
-    // Function to check if an event is registered
-    const isEventRegistered = (eventId: string) => {
-        return registeredEvents.includes(eventId);
-    };
     return (
         <ul>
             {event.length > 0 ? (

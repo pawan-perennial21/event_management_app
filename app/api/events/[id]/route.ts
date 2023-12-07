@@ -109,10 +109,13 @@ export async function PATCH(
         await connectMongoDB();
         await Event.findByIdAndUpdate(id, {
             ...eventData?._doc,
-            registered: true,
+            registered: !registered,
         });
+        const event = await Event.findOne({ _id: id });
         return NextResponse.json({
+            event ,
             message: "Registered updated",
+            statusCode: "ok",
             status: 200,
         });
     } catch (error) {
