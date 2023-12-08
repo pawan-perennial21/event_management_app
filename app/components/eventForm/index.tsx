@@ -67,8 +67,8 @@ const EventForm = ({ formDataItem, isEdit }: EventFormProps) => {
               })
             : await addEvent(dataValue);
         if (response.status === 200) {
-            router.refresh();
             router.push("/");
+            router.refresh();
         }
     };
 
