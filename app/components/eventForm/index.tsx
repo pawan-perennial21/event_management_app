@@ -84,7 +84,7 @@ const EventForm = ({ formDataItem, isEdit }: EventFormProps) => {
             />
 
             {errors.title?.message && (
-                <p className='text-red-500'>
+                <p className='text-red-500 -mt-2 mb-2'>
                     {errors.title?.message}
                 </p>
             )}
@@ -94,7 +94,7 @@ const EventForm = ({ formDataItem, isEdit }: EventFormProps) => {
                 placeholder='Description'
             />
             {errors.description?.message && (
-                <p className='text-red-500'>
+                <p className='text-red-500 -mt-2 mb-2'>
                     {errors.description?.message}
                 </p>
             )}
@@ -104,7 +104,7 @@ const EventForm = ({ formDataItem, isEdit }: EventFormProps) => {
                 placeholder='Location'
             />
             {errors.location?.message && (
-                <p className='text-red-500'>
+                <p className='text-red-500 -mt-2 mb-2'>
                     {errors.location?.message}
                 </p>
             )}
@@ -116,7 +116,9 @@ const EventForm = ({ formDataItem, isEdit }: EventFormProps) => {
                 placeholder='Date'
             />
             {errors.date?.message && (
-                <p className='text-red-500'>{errors.date?.message}</p>
+                <p className='text-red-500 -mt-2 mb-2'>
+                    {errors.date?.message}
+                </p>
             )}
 
             <Input
@@ -126,7 +128,9 @@ const EventForm = ({ formDataItem, isEdit }: EventFormProps) => {
                 placeholder='Time'
             />
             {errors.time?.message && (
-                <p className='text-red-500'>{errors.time?.message}</p>
+                <p className='text-red-500 -mt-2 mb-2'>
+                    {errors.time?.message}
+                </p>
             )}
             <Button
                 type='submit'
