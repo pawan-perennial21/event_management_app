@@ -9,7 +9,18 @@ import React from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDelete } from "react-icons/md";
 
-export default function EventItem(props: any) {
+interface IProps {
+    title: string;
+    date: string; // or use a Date type if the date is a specific format
+    location: string;
+    time: string;
+    id: string;
+    isRegistered: boolean | undefined;
+    onRegister: () => void; 
+    // Add other properties if necessary
+  }
+
+export default function EventItem(props: IProps) {
     const {
         title,
         date,
@@ -40,7 +51,7 @@ export default function EventItem(props: any) {
     const handleDelete = async (id: string) => {
         const confirmed = confirm("Are you sure?");
         if (confirmed) {
-            const res: any = await deleteEvent(id);
+            const res:any = await deleteEvent(id);
 
             if (res.statusCode === "ok") {
                 router.refresh();

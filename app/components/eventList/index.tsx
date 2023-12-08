@@ -7,7 +7,11 @@ import { useRouter } from "next/navigation";
 const EventItem = dynamic(() => import("../eventItem"), {
     ssr: false,
 });
-export default function EventList({ event }: any) {
+
+interface IEvent {
+    event: EventDetails[];
+}
+export default function EventList({ event }: IEvent) {
     const router = useRouter();
     const registerEvent = async (eventId: string) => {
         const res = await postRegisterdEvent(eventId);
@@ -28,7 +32,7 @@ export default function EventList({ event }: any) {
                             location={item.location}
                             date={item.date}
                             time={item.time}
-                            isRegistered={item?.registered}
+                            isRegistered={item.registered}
                             onRegister={() => registerEvent(item._id)}
                         />
                     ))}

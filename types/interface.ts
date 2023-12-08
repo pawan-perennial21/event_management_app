@@ -12,11 +12,11 @@ export interface EventFormValues {
     date: string;
     time: string;
     _id?: string;
-    id?: any;
+    id?: string;
     key?: string;
 }
 export interface EventDetails {
-    id: any;
+    id: string;
     title: string;
     location: string;
     date: string;
