@@ -16,7 +16,7 @@ export default async function Dashboard() {
                         className='flex justify-end m-2'
                         href={"/registerd-event"}
                     >
-                        <Button className='bg-orange-500 w-[30%]  mx-auto hover:bg-orange-700 mt-7'>
+                        <Button className='bg-orange-500 w-[30%] p-5  mx-auto hover:bg-orange-700 mt-7'>
                             Registered Event
                         </Button>
                     </Link>

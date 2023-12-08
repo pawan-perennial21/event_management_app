@@ -16,9 +16,9 @@ interface IProps {
     time: string;
     id: string;
     isRegistered: boolean | undefined;
-    onRegister: () => void; 
+    onRegister: () => void;
     // Add other properties if necessary
-  }
+}
 
 export default function EventItem(props: IProps) {
     const {
@@ -51,7 +51,7 @@ export default function EventItem(props: IProps) {
     const handleDelete = async (id: string) => {
         const confirmed = confirm("Are you sure?");
         if (confirmed) {
-            const res:any = await deleteEvent(id);
+            const res: any = await deleteEvent(id);
 
             if (res.statusCode === "ok") {
                 router.refresh();
@@ -59,7 +59,7 @@ export default function EventItem(props: IProps) {
         }
     };
     return (
-        <li className='border rounded-lg overflow-hidden shadow-md p-6 mx-20 my-10 bg-white'>
+        <li className='border rounded-lg overflow-hidden shadow-md p-4 md:p-6 lg:p-8 mx-2 md:mx-4 lg:mx-20 my-2 md:my-5 lg:my-10 bg-white'>
             <div className='flex justify-between'>
                 <div className='mb-4'>
                     <h2 className='text-2xl font-semibold mb-4'>
