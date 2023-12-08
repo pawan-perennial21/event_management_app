@@ -2,34 +2,37 @@ import { connectMongoDB } from "@/lib/mongodb";
 import Event from "@/models/event";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
+import { cache } from "react";
 
-export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
-    const { id } = params;
+export const GET = cache(
+    async (
+        request: Request,
+        { params }: { params: { id: string } }
+    ) => {
+        const { id } = params;
 
-    try {
-        await connectMongoDB();
-        const event = await Event.findOne({ _id: id });
+        try {
+            await connectMongoDB();
+            const event = await Event.findOne({ _id: id });
 
-        if (!event) {
-            return NextResponse.json({
-                message: "Event not found",
-                status: 404,
-            });
+            if (!event) {
+                return NextResponse.json({
+                    message: "Event not found",
+                    status: 404,
+                });
+            }
+
+            return NextResponse.json({ event }, { status: 200 });
+        } catch (error) {
+            return NextResponse.json(
+                { message: "Error fetching topic", error },
+                { status: 500 }
+            );
         }
-
-        return NextResponse.json({ event }, { status: 200 });
-    } catch (error) {
-        return NextResponse.json(
-            { message: "Error fetching topic", error },
-            { status: 500 }
-        );
     }
-}
+);
 
-export const DELETE = async (req: Request, res: Response) => {
+export const DELETE = cache(async (req: Request, res: Response) => {
     const id = req.url.split("/events/")[1];
 
     try {
@@ -64,65 +67,69 @@ export const DELETE = async (req: Request, res: Response) => {
             { status: 500 }
         );
     }
-};
+});
 
-export async function PUT(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
-    const { id } = params;
-    const { title, description, date, time, location } =
-        await request.json();
-    const timeAsDate = new Date(`1970-01-01T${time}`);
+export const PUT = cache(
+    async (
+        request: Request,
+        { params }: { params: { id: string } }
+    ) => {
+        const { id } = params;
+        const { title, description, date, time, location } =
+            await request.json();
+        const timeAsDate = new Date(`1970-01-01T${time}`);
 
-    try {
-        await connectMongoDB();
-        await Event.findByIdAndUpdate(id, {
-            title,
-            description,
-            date,
-            time: timeAsDate,
-            location,
-        });
-        return NextResponse.json({
-            message: "Event updated",
-            status: 200,
-        });
-    } catch (error) {
-        return NextResponse.json({
-            message: "Error updating event",
-            status: 500,
-            error,
-        });
+        try {
+            await connectMongoDB();
+            await Event.findByIdAndUpdate(id, {
+                title,
+                description,
+                date,
+                time: timeAsDate,
+                location,
+            });
+            return NextResponse.json({
+                message: "Event updated",
+                status: 200,
+            });
+        } catch (error) {
+            return NextResponse.json({
+                message: "Error updating event",
+                status: 500,
+                error,
+            });
+        }
     }
-}
+);
 
-export async function PATCH(
-    request: Request,
-    { params: { id } }: { params: { id: string } }
-) {
-    const { registered, ...eventData } = await Event.findOne({
-        _id: id,
-    });
+export const PATCH = cache(
+    async (
+        request: Request,
+        { params: { id } }: { params: { id: string } }
+    ) => {
+        const { registered, ...eventData } = await Event.findOne({
+            _id: id,
+        });
 
-    try {
-        await connectMongoDB();
-        await Event.findByIdAndUpdate(id, {
-            ...eventData?._doc,
-            registered: !registered,
-        });
-        const event = await Event.findOne({ _id: id });
-        return NextResponse.json({
-            event ,
-            message: "Registered updated",
-            statusCode: "ok",
-            status: 200,
-        });
-    } catch (error) {
-        return NextResponse.json({
-            message: "Error updating Registered Event",
-            status: 500,
-            error,
-        });
+        try {
+            await connectMongoDB();
+            await Event.findByIdAndUpdate(id, {
+                ...eventData?._doc,
+                registered: !registered,
+            });
+            const event = await Event.findOne({ _id: id });
+            return NextResponse.json({
+                event,
+                message: "Registered updated",
+                statusCode: "ok",
+                status: 200,
+            });
+        } catch (error) {
+            return NextResponse.json({
+                message: "Error updating Registered Event",
+                status: 500,
+                error,
+            });
+        }
     }
-}
+);

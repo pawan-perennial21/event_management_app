@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { postRegisterdEvent } from "@/api";
 import { EventDetails } from "@/types/interface";
 import dynamic from "next/dynamic";
@@ -8,7 +8,6 @@ const EventItem = dynamic(() => import("../eventItem"), {
     ssr: false,
 });
 export default function EventList({ event }: any) {
-    // Function to register an event
     const router = useRouter();
     const registerEvent = async (eventId: string) => {
         const res = await postRegisterdEvent(eventId);

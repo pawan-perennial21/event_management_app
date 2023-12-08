@@ -1,8 +1,9 @@
 import { connectMongoDB } from "@/lib/mongodb";
 import Event from "@/models/event";
 import { NextRequest, NextResponse } from "next/server";
+import { cache } from "react";
 
-export async function GET() {
+export const GET = cache(async () => {
     try {
         // Connect to MongoDB
         await connectMongoDB();
@@ -20,9 +21,9 @@ export async function GET() {
             { status: 500 }
         );
     }
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = cache(async (request: NextRequest) => {
     try {
         // Destructure title and description from the JSON body
         const { title, description, date, time, location } =
@@ -54,4 +55,4 @@ export async function POST(request: NextRequest) {
             { status: 500 }
         );
     }
-}
+});
